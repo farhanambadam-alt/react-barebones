@@ -546,14 +546,67 @@ const SalonDetail = () => {
       {/* Gallery Tab */}
       {activeTab === 'gallery' && (
         <div className="px-5 pt-4 animate-fade-in-up" style={{ animationDuration: '250ms' }}>
+          {/* Instagram Gallery & Videos */}
+          <h3 className="font-heading font-semibold text-[14px] text-foreground mb-3 flex items-center gap-2">
+            <Instagram size={15} className="text-primary" />
+            Gallery & Videos
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+            {galleryMedia.map((item, i) => {
+              const isReel = item.type === 'reel';
+              return (
+                <button
+                  key={i}
+                  onClick={() => setLightboxIndex(i)}
+                  className={`relative overflow-hidden rounded-2xl border border-border group active:scale-[0.97] transition-transform bg-secondary ${
+                    isReel ? 'aspect-[9/16] row-span-2' : 'aspect-square'
+                  }`}
+                >
+                  <img
+                    src={item.thumb}
+                    alt={`${item.type} ${i + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                  />
+                  {isReel && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                      <div className="w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                        <Play size={18} className="text-foreground ml-0.5" fill="currentColor" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-2 left-2 bg-foreground/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center gap-1">
+                    <Instagram size={10} className="text-primary-foreground" />
+                    <span className="text-[9px] font-heading text-primary-foreground font-medium capitalize">{item.type}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Static gallery images */}
+          <h3 className="font-heading font-semibold text-[14px] text-foreground mt-5 mb-3">Salon Photos</h3>
           <div className="space-y-2.5">
             <div className="aspect-video rounded-2xl overflow-hidden card-shadow border border-border">
-              <img src={galleryImages[0]} alt="Gallery hero" className="w-full h-full object-cover" loading="lazy" />
+              <img
+                src={galleryImages[0]}
+                alt="Gallery hero"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+              />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
               {galleryImages.slice(1).map((img, i) => (
                 <div key={i} className="aspect-square rounded-2xl overflow-hidden card-shadow border border-border">
-                  <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  <img
+                    src={img}
+                    alt={`Gallery ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                  />
                 </div>
               ))}
             </div>

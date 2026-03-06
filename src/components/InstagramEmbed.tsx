@@ -23,21 +23,24 @@ interface InstagramEmbedProps {
   url: string;
   /** 'post' for square images, 'reel' for 9:16 vertical video */
   type: 'post' | 'reel';
+  /** Callback when the embed has loaded */
+  onLoaded?: () => void;
 }
 
-const InstagramEmbed = ({ url, type }: InstagramEmbedProps) => {
+const InstagramEmbed = ({ url, type, onLoaded }: InstagramEmbedProps) => {
   const ref = useRef<HTMLQuoteElement>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     loadInstagramScript();
 
-    // Process embed once script is ready
     const processEmbed = () => {
       if (window.instgrm) {
         window.instgrm.Embeds.process();
-        // Give iframe time to render
-        setTimeout(() => setLoaded(true), 1500);
+        setTimeout(() => {
+          setLoaded(true);
+          onLoaded?.();
+        }, 1500);
       }
     };
 
@@ -52,7 +55,7 @@ const InstagramEmbed = ({ url, type }: InstagramEmbedProps) => {
       }, 200);
       return () => clearInterval(interval);
     }
-  }, [url]);
+  }, [url, onLoaded]);
 
   const isReel = type === 'reel';
 
