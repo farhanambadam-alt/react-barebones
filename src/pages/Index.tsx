@@ -7,6 +7,7 @@ import CategoryChips from '@/components/CategoryChips';
 import NearbySalonCard from '@/components/NearbySalonCard';
 import { categories, featuredSalons, nearbySalons, bookings } from '@/data/mockData';
 import { useGender } from '@/contexts/GenderContext';
+import GlowSearchBar from '@/components/GlowSearchBar';
 
 const HomePage = () => {
   const { gender, setGender } = useGender();
