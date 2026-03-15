@@ -1,0 +1,237 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface SparkleSearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  prefix?: string;
+  onClick?: () => void;
+  readOnly?: boolean;
+  className?: string;
+  autoFocus?: boolean;
+}
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  speedX: number;
+  speedY: number;
+  life: number;
+  maxLife: number;
+}
+
+const SparkleSearchBar = ({
+  value,
+  onChange,
+  placeholder = 'your perfect look...',
+  prefix = 'Find',
+  onClick,
+  readOnly = false,
+  className,
+  autoFocus = false,
+}: SparkleSearchBarProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const prefixRef = useRef<HTMLSpanElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animFrameRef = useRef<number>(0);
+  const particleIdRef = useRef(0);
+
+  const isActive = isFocused || value.length > 0;
+
+  const spawnParticles = useCallback((startX: number, width: number, height: number) => {
+    for (let i = 0; i < 3; i++) {
+      particlesRef.current.push({
+        id: particleIdRef.current++,
+        x: startX + Math.random() * width,
+        y: Math.random() * height,
+        size: Math.random() * 2 + 0.5,
+        opacity: Math.random() * 0.8 + 0.2,
+        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: (Math.random() - 0.5) * 0.3,
+        life: 0,
+        maxLife: 60 + Math.random() * 80,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+    resize();
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    const animate = () => {
+      const rect = container.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      if (isActive) {
+        // Calculate spotlight start position (after prefix)
+        const prefixEl = prefixRef.current;
+        const spotlightStart = prefixEl ? prefixEl.offsetLeft + prefixEl.offsetWidth + 4 : 70;
+        const spotlightWidth = w - spotlightStart - 16;
+
+        // Golden spotlight gradient
+        const gradient = ctx.createLinearGradient(spotlightStart, 0, spotlightStart + spotlightWidth, 0);
+        gradient.addColorStop(0, 'hsla(36, 60%, 55%, 0)');
+        gradient.addColorStop(0.15, 'hsla(36, 70%, 55%, 0.08)');
+        gradient.addColorStop(0.4, 'hsla(36, 80%, 60%, 0.15)');
+        gradient.addColorStop(0.6, 'hsla(36, 80%, 60%, 0.12)');
+        gradient.addColorStop(0.85, 'hsla(36, 70%, 55%, 0.06)');
+        gradient.addColorStop(1, 'hsla(36, 60%, 55%, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(spotlightStart, 0, spotlightWidth, h);
+
+        // Vertical golden cursor line
+        const cursorX = spotlightStart;
+        const cursorGradient = ctx.createLinearGradient(cursorX, h * 0.15, cursorX, h * 0.85);
+        cursorGradient.addColorStop(0, 'hsla(40, 80%, 65%, 0)');
+        cursorGradient.addColorStop(0.3, 'hsla(40, 90%, 70%, 0.9)');
+        cursorGradient.addColorStop(0.5, 'hsla(40, 95%, 75%, 1)');
+        cursorGradient.addColorStop(0.7, 'hsla(40, 90%, 70%, 0.9)');
+        cursorGradient.addColorStop(1, 'hsla(40, 80%, 65%, 0)');
+
+        ctx.strokeStyle = cursorGradient;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cursorX, h * 0.15);
+        ctx.lineTo(cursorX, h * 0.85);
+        ctx.stroke();
+
+        // Glow around cursor line
+        const glowGradient = ctx.createRadialGradient(cursorX, h / 2, 0, cursorX, h / 2, 20);
+        glowGradient.addColorStop(0, 'hsla(40, 90%, 70%, 0.25)');
+        glowGradient.addColorStop(1, 'hsla(40, 90%, 70%, 0)');
+        ctx.fillStyle = glowGradient;
+        ctx.fillRect(cursorX - 20, 0, 40, h);
+
+        // Spawn and draw particles
+        spawnParticles(spotlightStart, spotlightWidth, h);
+
+        particlesRef.current = particlesRef.current.filter(p => {
+          p.life++;
+          if (p.life > p.maxLife) return false;
+
+          p.x += p.speedX;
+          p.y += p.speedY;
+
+          const lifeRatio = p.life / p.maxLife;
+          const fadeIn = Math.min(lifeRatio * 5, 1);
+          const fadeOut = lifeRatio > 0.7 ? 1 - (lifeRatio - 0.7) / 0.3 : 1;
+          const alpha = p.opacity * fadeIn * fadeOut;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(40, 85%, 70%, ${alpha})`;
+          ctx.fill();
+
+          return true;
+        });
+
+        // Fog overlay
+        const fogGradient = ctx.createLinearGradient(spotlightStart, 0, spotlightStart + spotlightWidth, 0);
+        fogGradient.addColorStop(0, 'hsla(30, 30%, 40%, 0)');
+        fogGradient.addColorStop(0.3, 'hsla(30, 40%, 50%, 0.04)');
+        fogGradient.addColorStop(0.5, 'hsla(30, 50%, 55%, 0.06)');
+        fogGradient.addColorStop(0.7, 'hsla(30, 40%, 50%, 0.04)');
+        fogGradient.addColorStop(1, 'hsla(30, 30%, 40%, 0)');
+
+        ctx.fillStyle = fogGradient;
+        ctx.fillRect(spotlightStart, 0, spotlightWidth, h);
+      }
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      ro.disconnect();
+    };
+  }, [isActive, spawnParticles]);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onClick={handleClick}
+      className={cn(
+        'relative flex items-center gap-3 rounded-full px-5 py-3.5 overflow-hidden cursor-text transition-all duration-300',
+        'bg-foreground/90 backdrop-blur-md',
+        isActive && 'ring-1 ring-accent/30',
+        className
+      )}
+    >
+      {/* Canvas for sparkle effects */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+        style={{ width: '100%', height: '100%' }}
+      />
+
+      {/* Search icon */}
+      <Search size={17} className="relative z-[2] text-muted/80 flex-shrink-0" />
+
+      {/* Prefix text */}
+      <span
+        ref={prefixRef}
+        className="relative z-[2] text-[14px] font-serif italic text-muted/60 flex-shrink-0 select-none"
+      >
+        {prefix}
+      </span>
+
+      {/* Input */}
+      {readOnly ? (
+        <span className="relative z-[2] text-[14px] font-serif italic text-muted/40 flex-1">
+          {placeholder}
+        </span>
+      ) : (
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          autoFocus={autoFocus}
+          className="relative z-[2] flex-1 bg-transparent text-[14px] font-serif italic text-background/90 placeholder:text-muted/40 outline-none min-w-0"
+        />
+      )}
+    </div>
+  );
+};
+
+export default SparkleSearchBar;

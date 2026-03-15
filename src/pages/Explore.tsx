@@ -3,6 +3,7 @@ import { Search, SlidersHorizontal, Star, MapPin } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { featuredSalons, nearbySalons, categories } from '@/data/mockData';
 import { useGender } from '@/contexts/GenderContext';
+import SparkleSearchBar from '@/components/SparkleSearchBar';
 
 const allSalons = [...featuredSalons, ...nearbySalons];
 
@@ -48,17 +49,16 @@ const ExplorePage = () => {
       {/* Search */}
       <div className="sticky top-0 z-20 backdrop-blur-md border-b border-border/50 px-5 pt-5 pb-3">
         <h1 className="font-heading font-bold text-[18px] text-foreground mb-3">Explore</h1>
-        <div className="flex items-center gap-2.5 bg-card border border-border rounded-2xl px-4 py-3.5 card-shadow">
-          <Search size={17} className="text-muted-foreground flex-shrink-0" />
-          <input
-            type="text"
+        <div className="flex items-center gap-2.5">
+          <SparkleSearchBar
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search salons, services..."
-            className="flex-1 bg-transparent text-[14px] font-body text-foreground placeholder:text-muted-foreground outline-none"
+            onChange={setSearchQuery}
+            placeholder="salons, services..."
+            autoFocus
+            className="flex-1"
           />
-          <button className="p-1.5 rounded-lg bg-secondary min-h-[36px] min-w-[36px] flex items-center justify-center">
-            <SlidersHorizontal size={16} className="text-foreground" />
+          <button className="p-3 rounded-full bg-foreground/90 min-h-[48px] min-w-[48px] flex items-center justify-center flex-shrink-0">
+            <SlidersHorizontal size={16} className="text-background" />
           </button>
         </div>
       </div>
