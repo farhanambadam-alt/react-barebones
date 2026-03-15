@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SlidersHorizontal, Star, MapPin } from 'lucide-react';
+import { Search, SlidersHorizontal, Star, MapPin } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { featuredSalons, nearbySalons, categories } from '@/data/mockData';
 import { useGender } from '@/contexts/GenderContext';
