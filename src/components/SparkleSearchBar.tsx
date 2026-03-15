@@ -217,7 +217,7 @@ const SparkleSearchBar = ({
 
       {/* Input */}
       {readOnly ? (
-        <span className="relative z-[2] text-[14px] font-serif italic text-muted/40 flex-1">
+        <span className="relative z-[2] text-[16px] font-serif italic text-muted/40 flex-1">
           {placeholder}
         </span>
       ) : (
@@ -230,7 +230,7 @@ const SparkleSearchBar = ({
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="relative z-[2] flex-1 bg-transparent text-[14px] font-serif italic text-background/90 placeholder:text-muted/40 outline-none min-w-0"
+          className="relative z-[2] flex-1 bg-transparent text-[16px] font-serif italic text-background placeholder:text-muted/40 outline-none min-w-0"
         />
       )}
     </div>
