@@ -33,16 +33,12 @@ const AtHome = () => {
 
       {/* Search Bar */}
       <div className="px-5 mt-4">
-        <div className="relative">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search for artists or services"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-card/80 backdrop-blur-sm border border-border rounded-2xl text-[13px] font-body text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-          />
-        </div>
+        <SparkleSearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="artists or services..."
+          prefix="Find"
+        />
       </div>
 
       {/* Gender Toggle */}

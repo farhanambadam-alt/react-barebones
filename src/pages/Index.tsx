@@ -109,13 +109,12 @@ const HomePage = () => {
 
       {/* Search */}
       <div className="px-5 py-2">
-        <button
+        <SparkleSearchBar
+          value=""
+          onChange={() => {}}
           onClick={() => navigate('/explore')}
-          className="w-full flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3.5 card-shadow"
-        >
-          <Search size={17} className="text-muted-foreground flex-shrink-0" />
-          <span className="text-[14px] font-body text-muted-foreground">Search salons, services...</span>
-        </button>
+          readOnly
+        />
       </div>
 
       {/* Categories */}
