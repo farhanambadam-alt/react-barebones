@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { MapPin, Star, Clock, Shield, Bell, Search, Play, Navigation } from 'lucide-react';
+import { MapPin, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGender } from '@/contexts/GenderContext';
 import { atHomeArtists } from '@/data/atHomeData';
+import SparkleSearchBar from '@/components/SparkleSearchBar';
 
 const AtHome = () => {
   const navigate = useNavigate();
