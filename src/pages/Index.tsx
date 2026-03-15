@@ -1,13 +1,12 @@
 // sync commit trigger v2
 import { useState, useEffect } from 'react';
-import { MapPin, Bell, ChevronDown, Star, RotateCcw, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Bell, ChevronDown, Star, RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
 import CategoryChips from '@/components/CategoryChips';
 import NearbySalonCard from '@/components/NearbySalonCard';
 import { categories, featuredSalons, nearbySalons, bookings } from '@/data/mockData';
 import { useGender } from '@/contexts/GenderContext';
-import GlowSearchBar from '@/components/GlowSearchBar';
 
 const HomePage = () => {
   const { gender, setGender } = useGender();
@@ -109,7 +108,13 @@ const HomePage = () => {
 
       {/* Search */}
       <div className="px-5 py-2">
-        <GlowSearchBar onClick={() => navigate('/explore')} />
+        <button
+          onClick={() => navigate('/explore')}
+          className="w-full flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3.5 card-shadow"
+        >
+          <Search size={17} className="text-muted-foreground flex-shrink-0" />
+          <span className="text-[14px] font-body text-muted-foreground">Search salons, services...</span>
+        </button>
       </div>
 
       {/* Categories */}
