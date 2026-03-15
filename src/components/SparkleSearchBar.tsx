@@ -46,20 +46,25 @@ const SparkleSearchBar = ({
 
   const isActive = isFocused || value.length > 0;
 
+  const frameCountRef = useRef(0);
+
   const spawnParticles = useCallback((startX: number, width: number, height: number) => {
-    for (let i = 0; i < 3; i++) {
-      particlesRef.current.push({
-        id: particleIdRef.current++,
-        x: startX + Math.random() * width,
-        y: Math.random() * height,
-        size: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.8 + 0.2,
-        speedX: (Math.random() - 0.5) * 0.4,
-        speedY: (Math.random() - 0.5) * 0.3,
-        life: 0,
-        maxLife: 60 + Math.random() * 80,
-      });
-    }
+    // Spawn only 1 particle every 4 frames
+    frameCountRef.current++;
+    if (frameCountRef.current % 4 !== 0) return;
+    if (particlesRef.current.length > 12) return;
+
+    particlesRef.current.push({
+      id: particleIdRef.current++,
+      x: startX + Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 1 + 0.3,
+      opacity: Math.random() * 0.35 + 0.1,
+      speedX: (Math.random() - 0.5) * 0.2,
+      speedY: (Math.random() - 0.5) * 0.15,
+      life: 0,
+      maxLife: 80 + Math.random() * 60,
+    });
   }, []);
 
   useEffect(() => {
@@ -89,18 +94,17 @@ const SparkleSearchBar = ({
       ctx.clearRect(0, 0, w, h);
 
       if (isActive) {
-        // Calculate spotlight start position (after prefix)
         const prefixEl = prefixRef.current;
         const spotlightStart = prefixEl ? prefixEl.offsetLeft + prefixEl.offsetWidth + 4 : 70;
         const spotlightWidth = w - spotlightStart - 16;
 
-        // Golden spotlight gradient
+        // Subtle golden spotlight
         const gradient = ctx.createLinearGradient(spotlightStart, 0, spotlightStart + spotlightWidth, 0);
         gradient.addColorStop(0, 'hsla(36, 60%, 55%, 0)');
-        gradient.addColorStop(0.15, 'hsla(36, 70%, 55%, 0.08)');
-        gradient.addColorStop(0.4, 'hsla(36, 80%, 60%, 0.15)');
-        gradient.addColorStop(0.6, 'hsla(36, 80%, 60%, 0.12)');
-        gradient.addColorStop(0.85, 'hsla(36, 70%, 55%, 0.06)');
+        gradient.addColorStop(0.15, 'hsla(36, 70%, 55%, 0.05)');
+        gradient.addColorStop(0.4, 'hsla(36, 80%, 60%, 0.08)');
+        gradient.addColorStop(0.6, 'hsla(36, 80%, 60%, 0.06)');
+        gradient.addColorStop(0.85, 'hsla(36, 70%, 55%, 0.03)');
         gradient.addColorStop(1, 'hsla(36, 60%, 55%, 0)');
 
         ctx.fillStyle = gradient;
@@ -108,28 +112,28 @@ const SparkleSearchBar = ({
 
         // Vertical golden cursor line
         const cursorX = spotlightStart;
-        const cursorGradient = ctx.createLinearGradient(cursorX, h * 0.15, cursorX, h * 0.85);
+        const cursorGradient = ctx.createLinearGradient(cursorX, h * 0.2, cursorX, h * 0.8);
         cursorGradient.addColorStop(0, 'hsla(40, 80%, 65%, 0)');
-        cursorGradient.addColorStop(0.3, 'hsla(40, 90%, 70%, 0.9)');
-        cursorGradient.addColorStop(0.5, 'hsla(40, 95%, 75%, 1)');
-        cursorGradient.addColorStop(0.7, 'hsla(40, 90%, 70%, 0.9)');
+        cursorGradient.addColorStop(0.3, 'hsla(40, 90%, 70%, 0.6)');
+        cursorGradient.addColorStop(0.5, 'hsla(40, 95%, 75%, 0.8)');
+        cursorGradient.addColorStop(0.7, 'hsla(40, 90%, 70%, 0.6)');
         cursorGradient.addColorStop(1, 'hsla(40, 80%, 65%, 0)');
 
         ctx.strokeStyle = cursorGradient;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(cursorX, h * 0.15);
-        ctx.lineTo(cursorX, h * 0.85);
+        ctx.moveTo(cursorX, h * 0.2);
+        ctx.lineTo(cursorX, h * 0.8);
         ctx.stroke();
 
-        // Glow around cursor line
-        const glowGradient = ctx.createRadialGradient(cursorX, h / 2, 0, cursorX, h / 2, 20);
-        glowGradient.addColorStop(0, 'hsla(40, 90%, 70%, 0.25)');
+        // Small glow around cursor
+        const glowGradient = ctx.createRadialGradient(cursorX, h / 2, 0, cursorX, h / 2, 12);
+        glowGradient.addColorStop(0, 'hsla(40, 90%, 70%, 0.12)');
         glowGradient.addColorStop(1, 'hsla(40, 90%, 70%, 0)');
         ctx.fillStyle = glowGradient;
-        ctx.fillRect(cursorX - 20, 0, 40, h);
+        ctx.fillRect(cursorX - 12, 0, 24, h);
 
-        // Spawn and draw particles
+        // Spawn tiny sparse particles
         spawnParticles(spotlightStart, spotlightWidth, h);
 
         particlesRef.current = particlesRef.current.filter(p => {
@@ -140,25 +144,24 @@ const SparkleSearchBar = ({
           p.y += p.speedY;
 
           const lifeRatio = p.life / p.maxLife;
-          const fadeIn = Math.min(lifeRatio * 5, 1);
-          const fadeOut = lifeRatio > 0.7 ? 1 - (lifeRatio - 0.7) / 0.3 : 1;
+          const fadeIn = Math.min(lifeRatio * 4, 1);
+          const fadeOut = lifeRatio > 0.6 ? 1 - (lifeRatio - 0.6) / 0.4 : 1;
           const alpha = p.opacity * fadeIn * fadeOut;
 
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(40, 85%, 70%, ${alpha})`;
+          ctx.fillStyle = `hsla(40, 70%, 75%, ${alpha})`;
           ctx.fill();
 
           return true;
         });
 
-        // Fog overlay
+        // Fog: fades from visible at start to transparent at end
         const fogGradient = ctx.createLinearGradient(spotlightStart, 0, spotlightStart + spotlightWidth, 0);
-        fogGradient.addColorStop(0, 'hsla(30, 30%, 40%, 0)');
-        fogGradient.addColorStop(0.3, 'hsla(30, 40%, 50%, 0.04)');
-        fogGradient.addColorStop(0.5, 'hsla(30, 50%, 55%, 0.06)');
-        fogGradient.addColorStop(0.7, 'hsla(30, 40%, 50%, 0.04)');
-        fogGradient.addColorStop(1, 'hsla(30, 30%, 40%, 0)');
+        fogGradient.addColorStop(0, 'hsla(30, 30%, 45%, 0.07)');
+        fogGradient.addColorStop(0.25, 'hsla(30, 35%, 50%, 0.04)');
+        fogGradient.addColorStop(0.5, 'hsla(30, 30%, 45%, 0.02)');
+        fogGradient.addColorStop(1, 'hsla(30, 30%, 45%, 0)');
 
         ctx.fillStyle = fogGradient;
         ctx.fillRect(spotlightStart, 0, spotlightWidth, h);
