@@ -4,6 +4,7 @@ import { Search, MapPin, Bell, ChevronDown, Star, RotateCcw, ArrowRight } from '
 import { useNavigate } from 'react-router-dom';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
 import CategoryChips from '@/components/CategoryChips';
+import SparkleSearchBar from '@/components/SparkleSearchBar';
 import NearbySalonCard from '@/components/NearbySalonCard';
 import { categories, featuredSalons, nearbySalons, bookings } from '@/data/mockData';
 import { useGender } from '@/contexts/GenderContext';
