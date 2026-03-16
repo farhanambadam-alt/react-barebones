@@ -44,7 +44,7 @@ const SparkleSearchBar = ({
   const animFrameRef = useRef<number>(0);
   const particleIdRef = useRef(0);
 
-  const isActive = isFocused || value.length > 0;
+  const isActive = true; // Always on
 
   const frameCountRef = useRef(0);
 
