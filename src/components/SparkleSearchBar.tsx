@@ -158,7 +158,7 @@ const SparkleSearchBar = ({
         ctx.fillRect(cursorX - 14, 0, 28, h);
 
         // Sparse tiny sparkles
-        spawnParticles(spotlightStart, spotlightWidth, h);
+        spawnParticles(spotlightStart, endX - spotlightStart, h);
 
         particlesRef.current = particlesRef.current.filter(p => {
           p.life++;
