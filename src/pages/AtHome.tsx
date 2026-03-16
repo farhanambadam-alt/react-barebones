@@ -38,6 +38,7 @@ const AtHome = () => {
           onChange={setSearchQuery}
           placeholder="artists or services..."
           prefix="Find"
+          gender={gender}
         />
       </div>
 
