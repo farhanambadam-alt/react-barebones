@@ -242,19 +242,19 @@ const SparkleSearchBar = ({
       />
 
       {/* Search icon */}
-      <Search size={17} className="relative z-[2] text-muted/80 flex-shrink-0" />
+      <Search size={17} className="relative z-[2] text-background/60 flex-shrink-0" />
 
       {/* Prefix text */}
       <span
         ref={prefixRef}
-        className="relative z-[2] text-[14px] font-serif italic text-muted/60 flex-shrink-0 select-none"
+        className="relative z-[2] text-[15px] font-serif italic text-background/70 flex-shrink-0 select-none"
       >
         {prefix}
       </span>
 
       {/* Input */}
       {readOnly ? (
-        <span className="relative z-[2] text-[16px] font-serif italic text-muted/40 flex-1">
+        <span className="relative z-[2] text-[15px] font-serif italic text-background/35 flex-1">
           {placeholder}
         </span>
       ) : (
@@ -267,7 +267,7 @@ const SparkleSearchBar = ({
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="relative z-[2] flex-1 bg-transparent text-[16px] font-serif italic text-background placeholder:text-muted/40 outline-none min-w-0"
+          className="relative z-[2] flex-1 bg-transparent text-[15px] font-serif italic text-background placeholder:text-background/35 outline-none min-w-0"
         />
       )}
     </div>
