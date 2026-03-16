@@ -95,70 +95,89 @@ const SparkleSearchBar = ({
 
       if (isActive) {
         const prefixEl = prefixRef.current;
-        const spotlightStart = prefixEl ? prefixEl.offsetLeft + prefixEl.offsetWidth + 4 : 70;
+        const cursorX = prefixEl ? prefixEl.offsetLeft + prefixEl.offsetWidth + 4 : 70;
         const centerY = h / 2;
-        const endX = w - 8;
+        const leftX = 8;
+        const rightX = w - 8;
 
-        // === Angled cone beam from cursor line spreading to right ===
+        // === RIGHT cone: spreads from cursor toward right edge ===
         ctx.save();
         ctx.beginPath();
-        // Cone: narrow at cursor, fans out vertically toward the right edge
-        const coneNarrow = h * 0.18; // half-height at origin
-        const coneWide = h * 0.55;   // half-height at far end
-        ctx.moveTo(spotlightStart, centerY - coneNarrow);
-        ctx.lineTo(endX, centerY - coneWide);
-        ctx.lineTo(endX, centerY + coneWide);
-        ctx.lineTo(spotlightStart, centerY + coneNarrow);
+        const rNarrow = h * 0.15;
+        const rWide = h * 0.6;
+        ctx.moveTo(cursorX, centerY - rNarrow);
+        ctx.lineTo(rightX, centerY - rWide);
+        ctx.lineTo(rightX, centerY + rWide);
+        ctx.lineTo(cursorX, centerY + rNarrow);
         ctx.closePath();
         ctx.clip();
 
-        // Horizontal fade within the cone
-        const beamGrad = ctx.createLinearGradient(spotlightStart, 0, endX, 0);
-        beamGrad.addColorStop(0, 'hsla(35, 60%, 58%, 0.16)');
-        beamGrad.addColorStop(0.08, 'hsla(34, 55%, 55%, 0.11)');
-        beamGrad.addColorStop(0.25, 'hsla(32, 45%, 50%, 0.06)');
-        beamGrad.addColorStop(0.5, 'hsla(30, 35%, 48%, 0.025)');
-        beamGrad.addColorStop(1, 'hsla(28, 25%, 45%, 0)');
-        ctx.fillStyle = beamGrad;
-        ctx.fillRect(spotlightStart, 0, endX - spotlightStart, h);
-
-        // Radial glow at origin for brightness concentration
-        const glowR = h * 0.9;
-        const originGlow = ctx.createRadialGradient(spotlightStart, centerY, 0, spotlightStart, centerY, glowR);
-        originGlow.addColorStop(0, 'hsla(38, 70%, 62%, 0.14)');
-        originGlow.addColorStop(0.3, 'hsla(36, 60%, 58%, 0.06)');
-        originGlow.addColorStop(1, 'hsla(34, 50%, 50%, 0)');
-        ctx.fillStyle = originGlow;
-        ctx.fillRect(spotlightStart - 4, 0, glowR + 4, h);
-
+        const rightGrad = ctx.createLinearGradient(cursorX, 0, rightX, 0);
+        rightGrad.addColorStop(0, 'hsla(25, 55%, 45%, 0.22)');
+        rightGrad.addColorStop(0.06, 'hsla(25, 50%, 42%, 0.15)');
+        rightGrad.addColorStop(0.18, 'hsla(22, 42%, 38%, 0.08)');
+        rightGrad.addColorStop(0.4, 'hsla(20, 35%, 35%, 0.03)');
+        rightGrad.addColorStop(1, 'hsla(18, 25%, 30%, 0)');
+        ctx.fillStyle = rightGrad;
+        ctx.fillRect(cursorX, 0, rightX - cursorX, h);
         ctx.restore();
 
-        // Vertical golden cursor line
-        const cursorX = spotlightStart;
-        const cursorGradient = ctx.createLinearGradient(cursorX, h * 0.15, cursorX, h * 0.85);
-        cursorGradient.addColorStop(0, 'hsla(40, 80%, 65%, 0)');
-        cursorGradient.addColorStop(0.25, 'hsla(40, 90%, 70%, 0.65)');
-        cursorGradient.addColorStop(0.5, 'hsla(40, 95%, 75%, 0.85)');
-        cursorGradient.addColorStop(0.75, 'hsla(40, 90%, 70%, 0.65)');
-        cursorGradient.addColorStop(1, 'hsla(40, 80%, 65%, 0)');
+        // === LEFT cone: spreads from cursor toward left edge ===
+        ctx.save();
+        ctx.beginPath();
+        const lNarrow = h * 0.12;
+        const lWide = h * 0.45;
+        ctx.moveTo(cursorX, centerY - lNarrow);
+        ctx.lineTo(leftX, centerY - lWide);
+        ctx.lineTo(leftX, centerY + lWide);
+        ctx.lineTo(cursorX, centerY + lNarrow);
+        ctx.closePath();
+        ctx.clip();
 
-        ctx.strokeStyle = cursorGradient;
+        const leftGrad = ctx.createLinearGradient(cursorX, 0, leftX, 0);
+        leftGrad.addColorStop(0, 'hsla(25, 55%, 45%, 0.18)');
+        leftGrad.addColorStop(0.1, 'hsla(23, 45%, 40%, 0.10)');
+        leftGrad.addColorStop(0.3, 'hsla(20, 35%, 36%, 0.04)');
+        leftGrad.addColorStop(1, 'hsla(18, 25%, 30%, 0)');
+        ctx.fillStyle = leftGrad;
+        ctx.fillRect(leftX, 0, cursorX - leftX, h);
+        ctx.restore();
+
+        // Radial warm glow at cursor origin
+        const glowR = h * 1.2;
+        const originGlow = ctx.createRadialGradient(cursorX, centerY, 0, cursorX, centerY, glowR);
+        originGlow.addColorStop(0, 'hsla(28, 60%, 48%, 0.20)');
+        originGlow.addColorStop(0.15, 'hsla(25, 50%, 42%, 0.10)');
+        originGlow.addColorStop(0.4, 'hsla(22, 40%, 38%, 0.03)');
+        originGlow.addColorStop(1, 'hsla(20, 30%, 32%, 0)');
+        ctx.fillStyle = originGlow;
+        ctx.fillRect(cursorX - glowR, 0, glowR * 2, h);
+
+        // Vertical golden cursor line
+        const cursorGrad = ctx.createLinearGradient(cursorX, h * 0.1, cursorX, h * 0.9);
+        cursorGrad.addColorStop(0, 'hsla(35, 80%, 60%, 0)');
+        cursorGrad.addColorStop(0.2, 'hsla(35, 90%, 65%, 0.6)');
+        cursorGrad.addColorStop(0.5, 'hsla(38, 95%, 70%, 0.85)');
+        cursorGrad.addColorStop(0.8, 'hsla(35, 90%, 65%, 0.6)');
+        cursorGrad.addColorStop(1, 'hsla(35, 80%, 60%, 0)');
+
+        ctx.strokeStyle = cursorGrad;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(cursorX, h * 0.15);
-        ctx.lineTo(cursorX, h * 0.85);
+        ctx.moveTo(cursorX, h * 0.1);
+        ctx.lineTo(cursorX, h * 0.9);
         ctx.stroke();
 
         // Small glow halo around cursor
-        const glowGradient = ctx.createRadialGradient(cursorX, centerY, 0, cursorX, centerY, 14);
-        glowGradient.addColorStop(0, 'hsla(40, 90%, 72%, 0.18)');
-        glowGradient.addColorStop(0.5, 'hsla(40, 85%, 68%, 0.05)');
-        glowGradient.addColorStop(1, 'hsla(40, 80%, 65%, 0)');
-        ctx.fillStyle = glowGradient;
-        ctx.fillRect(cursorX - 14, 0, 28, h);
+        const haloGrad = ctx.createRadialGradient(cursorX, centerY, 0, cursorX, centerY, 12);
+        haloGrad.addColorStop(0, 'hsla(35, 85%, 68%, 0.16)');
+        haloGrad.addColorStop(0.5, 'hsla(35, 75%, 60%, 0.04)');
+        haloGrad.addColorStop(1, 'hsla(35, 65%, 55%, 0)');
+        ctx.fillStyle = haloGrad;
+        ctx.fillRect(cursorX - 12, 0, 24, h);
 
         // Sparse tiny sparkles
-        spawnParticles(spotlightStart, endX - spotlightStart, h);
+        spawnParticles(cursorX, rightX - cursorX, h);
 
         particlesRef.current = particlesRef.current.filter(p => {
           p.life++;
