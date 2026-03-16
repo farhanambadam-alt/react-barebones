@@ -114,6 +114,7 @@ const HomePage = () => {
           onChange={() => {}}
           onClick={() => navigate('/explore')}
           readOnly
+          gender={gender}
         />
       </div>
 

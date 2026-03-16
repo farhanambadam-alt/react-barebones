@@ -56,6 +56,7 @@ const ExplorePage = () => {
             placeholder="salons, services..."
             autoFocus
             className="flex-1"
+            gender={gender}
           />
           <button className="p-3 rounded-full bg-foreground/90 min-h-[48px] min-w-[48px] flex items-center justify-center flex-shrink-0">
             <SlidersHorizontal size={16} className="text-background" />
